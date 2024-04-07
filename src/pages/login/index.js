@@ -23,6 +23,7 @@ import {
   Typography
 } from '@mui/material'
 import { styled } from '@mui/system'
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 
 // ** Material UI Icons Imports
 
@@ -42,6 +43,13 @@ import { createToken, verifyToken } from '../../@core/utils/auth'
 
 // ** Components view Import
 import LoadingLogin from 'src/views/login/Loading'
+
+// SEO
+// import MySeo from '../seo'
+// import { SeoLoginpage } from 'src/seo/homepage'
+// import typography from 'src/@core/components/typography'
+
+const initialPasswordValue = '1'
 
 // ** Switch Alert Import
 const SwitchAlert = require('sweetalert2')
@@ -74,6 +82,7 @@ const CardStyled = styled(Card)(({ theme }) => ({
 const LinkStyled = styled('a')(({ theme }) => ({
   fontSize: '0.875rem',
   textDecoration: 'none',
+  align: 'center',
   color: theme.palette.primary.main
 }))
 
@@ -82,12 +91,19 @@ const LoginPage = () => {
   const [user, setUser] = useState('') // User
   const [password, setPassword] = useState('') // Password
   const [responseData, setResponseData] = useState('') // เก็บค่า Data ที่จะเอาไปฝังใน Local Storage
-  const [verificationComplete, setVerificationComplete] = useState(false)
+  const [verificationComplete, setVerificationComplete] = useState(true)
 
   const [values, setValues] = useState({
     password: '',
     showPassword: false
   })
+
+  // useEffect(() => {
+  //   const signInButton = document.getElementById('signInButton')
+  //   if (signInButton) {
+  //     signInButton.click()
+  //   }
+  // }, [])
 
   // ** Hook
   const router = useRouter()
@@ -141,14 +157,7 @@ const LoginPage = () => {
     }
 
     axios
-      .post(`https://111.223.38.19/api/method/frappe.API.TCTM.authen.login`, data, {
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
-          'Access-Control-Allow-Origin': '*',
-          Authorization: 'token 76dc8ec5e14d19c:a644317879022f2'
-        }
-      })
+      .post(`${process.env.NEXT_PUBLIC_API}DIGITAL.authen.login`, data)
       .then(response => {
         if (response.data.message) {
           const receivedStatus = response.data.message.Message
@@ -217,104 +226,136 @@ const LoginPage = () => {
       })
   }
 
+  const handleSubmit = event => {
+    event.preventDefault()
+    handleSubmitData(event)
+  }
+
   return (
     <Background className='content-center'>
+      {/* <MySeo
+        title={'Login'}
+        description={SeoLoginpage.description}
+        keywords={SeoLoginpage.keywords}
+        content={SeoLoginpage.content}
+      /> */}
       <CardStyled sx={{ zIndex: 1 }}>
         <CardContent>
-          <Grid container spacing={3} justifyContent='center' alignItems='center'>
-            <Grid item xs={12}>
-              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <CardMedia
-                  component='img'
-                  image='https://media.discordapp.net/attachments/1143783715877703833/1158967489900851200/cropped-LOGO-TCTM-1.png?ex=651e2c16&is=651cda96&hm=9f5f51b5926258a32e2a6029a918b169cec1003e70f7c6ec5cbf549749b623c8&=&width=1440&height=306'
-                  alt='logo'
-                  sx={{ width: '260px' }}
-                />
-              </Box>
-            </Grid>
-            <Hidden only='xs'>
+          <form onSubmit={handleSubmit}>
+            {' '}
+            {/* Wrap the content in a form */}
+            <Grid container spacing={3} justifyContent='center' alignItems='center'>
               <Grid item xs={12}>
-                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                  <Typography variant='h4' color='#2D2E81' sx={{ fontWeight: 600 }}>
-                    Welcome to <span style={{ color: '#BF1522' }}>TCTM</span> marketplace
+                <Link href='/' passHref>
+                  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer' }}>
+                    <CardMedia
+                      component='img'
+                      image='/Logo_digital2day/digital2dayloginpage2.png'
+                      alt='logo'
+                      sx={{ width: '260px' }}
+                    />
+                  </Box>
+                </Link>
+              </Grid>
+              <Hidden only='xs'>
+                <Grid item xs={12}>
+                  <Link href='/' passHref>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer' }}>
+                      {/* <Typography sx={typography.h1.title} color='##2D2E81'>
+                        Welcome to <span style={{ color: '#BF1522' }}>Digital</span> marketplace
+                      </Typography> */}
+                    </Box>
+                  </Link>
+                </Grid>
+              </Hidden>
+              <Grid item xs={12}>
+                <Box sx={{ width: '100%', marginBottom: 2 }}>
+                  <Typography variant='h5' textAlign='center' sx={{ fontWeight: 600 }}>
+                    Login to your account
                   </Typography>
                 </Box>
               </Grid>
-            </Hidden>
-            <Grid item xs={12}>
-              <Box sx={{ width: '100%', marginBottom: 2 }}>
-                <Typography variant='h5' textAlign='center' sx={{ fontWeight: 600 }}>
-                  Login to your account
-                </Typography>
-              </Box>
-            </Grid>
-            <Grid item xs={12}>
-              <Box sx={{ width: '100%' }}>
-                <TextField
-                  fullWidth
-                  id='email'
-                  label='Email'
-                  variant='outlined'
-                  onChange={handleSetUser}
-                  InputProps={{
-                    style: {
-                      borderRadius: '10px'
-                    }
-                  }}
-                />
-              </Box>
-            </Grid>
-            <Grid item xs={12}>
-              <Box sx={{ width: '100%' }}>
-                <FormControl fullWidth variant='outlined'>
-                  <InputLabel htmlFor='outlined-adornment-password'>Password</InputLabel>
-                  <OutlinedInput
-                    id='outlined-adornment-password'
-                    label='Password'
-                    value={values.password}
-                    type={values.showPassword ? 'text' : 'password'}
-                    onChange={handleSetPassword('password')}
-                    endAdornment={
-                      <InputAdornment position='end'>
-                        <IconButton
-                          edge='end'
-                          onClick={handleClickShowPassword}
-                          onMouseDown={handleMouseDownPassword}
-                          aria-label='toggle password visibility'
-                        >
-                          {values.showPassword ? <EyeOutline /> : <EyeOffOutline />}
-                        </IconButton>
-                      </InputAdornment>
-                    }
-                    sx={{ marginBottom: 4, borderRadius: '10px' }}
+              <Grid item xs={12}>
+                <Box sx={{ width: '100%' }}>
+                  <TextField
+                    fullWidth
+                    id='email'
+                    label='Username'
+                    variant='outlined'
+                    onChange={handleSetUser}
+                    InputProps={{
+                      style: {
+                        borderRadius: '10px'
+                      }
+                    }}
                   />
-                </FormControl>
-              </Box>
+                </Box>
+              </Grid>
+              <Grid item xs={12}>
+                <Box sx={{ width: '100%' }}>
+                  <FormControl fullWidth variant='outlined'>
+                    <InputLabel htmlFor='outlined-adornment-password'>Password</InputLabel>
+                    <OutlinedInput
+                      id='outlined-adornment-password'
+                      label='Password'
+                      value={values.password}
+                      type={values.showPassword ? 'text' : 'password'}
+                      onChange={handleSetPassword('password')}
+                      endAdornment={
+                        <InputAdornment position='end'>
+                          <IconButton
+                            edge='end'
+                            onClick={handleClickShowPassword}
+                            onMouseDown={handleMouseDownPassword}
+                            aria-label='toggle password visibility'
+                          >
+                            {values.showPassword ? <EyeOutline /> : <EyeOffOutline />}
+                          </IconButton>
+                        </InputAdornment>
+                      }
+                      sx={{ marginBottom: 4, borderRadius: '10px' }}
+                    />
+                  </FormControl>
+                </Box>
+              </Grid>
+              <Grid item xs={12}>
+                <Box sx={{ width: '100%' }}>
+                  <Button
+                    fullWidth
+                    type='submit' // Handle submit on button click
+                    variant='contained'
+                    color='primary'
+                    sx={{ borderRadius: '10px' }}
+                  >
+                    Sign In
+                  </Button>
+                </Box>
+              </Grid>
+              <Grid item xs={12}>
+                <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+                  <Typography variant='body2' sx={{ marginRight: 2 }}>
+                    Not a member?
+                  </Typography>
+                  <Link href='/member/register' passHref>
+                    <LinkStyled> Register</LinkStyled>
+                  </Link>
+                </Box>
+              </Grid>
+
+              <Grid item xs={12}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Link href='/' passHref>
+                    <LinkStyled
+                      sx={{ display: 'flex', alignItems: 'center', fontWeight: 'bold', textDecoration: 'none' }}
+                    >
+                      <ShoppingCartIcon sx={{ fontSize: '30px', marginLeft: '5px' }} />
+                      <span style={{ fontSize: '16px' }}>Go to Firstpage</span>
+                    </LinkStyled>
+                  </Link>
+                </Box>
+              </Grid>
             </Grid>
-            <Grid item xs={12}>
-              <Box sx={{ width: '100%' }}>
-                <Button
-                  fullWidth
-                  variant='contained'
-                  color='primary'
-                  onClick={handleSubmitData}
-                  sx={{ borderRadius: '10px' }}
-                >
-                  Sign In
-                </Button>
-              </Box>
-            </Grid>
-            <Grid item xs={12}>
-              <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
-                <Typography variant='body2' sx={{ marginRight: 2 }}>
-                  Not a member?{' '}
-                </Typography>
-                <Link href='/member/register' passHref>
-                  <LinkStyled> Register</LinkStyled>
-                </Link>
-              </Box>
-            </Grid>
-          </Grid>
+          </form>
         </CardContent>
       </CardStyled>
     </Background>
